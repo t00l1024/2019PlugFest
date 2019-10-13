@@ -1,0 +1,86 @@
+ofctl13 () {
+        ovs-ofctl -O Openflow13 $1 $2 $3 $4
+}
+
+# Create network namespace
+create_ns () {
+    NAME=$1
+    IP=$2
+    NETNS=ns-${NAME}
+    sudo ip netns add ${NETNS}
+    sudo ip link add dev veth-${NAME} type veth peer name veth0 netns $NETNS
+    sudo ip link set dev veth-${NAME} up
+    sudo ip netns exec ${NETNS} ip link set dev veth0 up
+    sudo ip netns exec ${NETNS} ip addr add dev veth0 $IP
+    sudo ip netns exec ${NETNS} ip link set dev lo up
+}
+
+# Create Open vSwitch path port
+ovs_patch () {
+    DP1=$1
+    DP1P=$2
+    DP2=$3
+    DP2P=$4
+
+    sudo ovs-vsctl add-port ${DP1} ${DP1}-${DP1P} \
+        -- set interface ${DP1}-${DP1P} type=patch \
+        -- set interface ${DP1}-${DP1P} options:peer=${DP2}-${DP2P} \
+        -- set interface ${DP1}-${DP1P} ofport_request=${DP1P}
+
+    sudo ovs-vsctl add-port ${DP2} ${DP2}-${DP2P} \
+        -- set interface ${DP2}-${DP2P} type=patch \
+        -- set interface ${DP2}-${DP2P} options:peer=${DP1}-${DP1P} \
+        -- set interface ${DP2}-${DP2P} ofport_request=${DP2P}
+
+}
+
+# Run command inside network namespace
+as_ns () {
+    NAME=$1
+    NETNS=ns-${NAME}
+    shift
+    sudo ip netns exec $NETNS $@
+}
+
+
+# Clean up namespaces, bridges and processes created during faucet tutorial
+cleanup () {
+    for NETNS in $(sudo ip netns list | grep "ns-" | awk '{print $1}'); do
+        [ -n "$NETNS" ] || continue
+        NAME=${NETNS#ns-}
+        if [ -f "/run/dhclient-${NAME}.pid" ]; then
+            # Stop dhclient
+            sudo pkill -F "/run/dhclient-${NAME}.pid"
+        fi
+        # Remove netns and veth pair
+        sudo ip link delete veth-${NAME}
+        sudo ip netns delete $NETNS
+    done
+    for DNSMASQ in /run/dnsmasq-vlan*.pid; do
+        [ -e "$DNSMASQ" ] || continue
+        # Stop dnsmasq
+        sudo pkill -F "${DNSMASQ}"
+    done
+
+    # Remove faucet dataplane connection
+    sudo ip link delete veth-faucet 2>/dev/null || true
+
+    # Remove openvswitch bridges
+    sudo ovs-vsctl del-br t1-sw1 2>/dev/null || true
+    sudo ovs-vsctl del-br t1-sw2 2>/dev/null || true
+    sudo ovs-vsctl del-br t2-sw1 2>/dev/null || true
+    sudo ovs-vsctl del-br t2-sw2 2>/dev/null || true
+    sudo ovs-vsctl del-br ext-net 2>/dev/null || true
+}
+
+# Add tagged VLAN interface to network namespace
+add_tagged_interface () {
+     NAME=$1
+     IP=$2
+     VLAN=$3
+     NETNS=ns-${NAME}
+     sudo ip netns exec ${NETNS} ip link add link veth0 name veth0.${VLAN} type vlan id $VLAN
+     sudo ip netns exec ${NETNS} ip link set dev veth0.${VLAN} up
+     sudo ip netns exec ${NETNS} ip addr flush dev veth0
+     sudo ip netns exec ${NETNS} ip addr add dev veth0.${VLAN} $IP
+}
