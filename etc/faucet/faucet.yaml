@@ -42,6 +42,8 @@ dps:
     t1-sw2:
         dp_id: 0x02
         hardware: "Open vSwitch"
+        stack:
+            priority: 1
         drop_spoofed_faucet_mac: False
         interfaces:
             1:
