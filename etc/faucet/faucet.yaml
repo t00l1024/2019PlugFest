@@ -3,15 +3,15 @@ include:
 
 vlans:
     net1:
-        vid: 100
+        vid: 10
         description: "office network"
         faucet_mac: "0e:00:00:00:10:01"
-        faucet_vips: ['10.0.100.254/24', '2001:100::1/64', 'fe80::c00:00ff:fe00:1001/64']
+        faucet_vips: ['192.168.10.1/24', '2001:100::1/64', 'fe80::c00:00ff:fe00:1001/64']
     net2:
-        vid: 200
+        vid: 20
         description: "guest network"
         faucet_mac: "0e:00:00:00:20:01"
-        faucet_vips: ['10.0.200.254/24', '2001:200::1/64', 'fe80::c00:00ff:fe00:2001/64']
+        faucet_vips: ['192.168.20.1/24', '2001:200::1/64', 'fe80::c00:00ff:fe00:2001/64']
 
 routers:
     router-net1-net2:
@@ -19,8 +19,11 @@ routers:
 
 dps:
     t1-sw1:
-        dp_id: 0x1
+        dp_id: 0x01
         hardware: "Open vSwitch"
+        stack:
+            priority: 1
+        drop_spoofed_faucet_mac: False
         interfaces:
             1:
                 name: "sp-t2-sw1"
@@ -33,15 +36,13 @@ dps:
             4:
                 name: "sp-ext-net-p1"
                 description: "StackPort to External Network"
-                stack: { dp: ext-net, port: 1 }
             5:
                 name: "sp-ext-net-p2"
                 description: "StackPort to Extternal Network"
-                stack: { dp: ext-net, port: 2 }
     t1-sw2:
-        dp_id: 0x2
+        dp_id: 0x02
         hardware: "Open vSwitch"
-        drop_spoofed_faucet_mac: false
+        drop_spoofed_faucet_mac: False
         interfaces:
             1:
                 name: "sp-t1-sw2"
@@ -54,18 +55,17 @@ dps:
             3:
                 name: "posdeidon"
                 description: "Poseidon"
+                native_vlan: net2
             4:
                 name: "sp-ext-net-p3"
                 description: "StackPort to External Network"
-                stack: { dp: ext-net, port: 3 }
             5:
                 name: "sp-ext-net-p4"
                 description: "StackPort to Extternal Network"
-                stack: { dp: ext-net, port: 4 }
     t2-sw1:
-        dp_id: 0x3
+        dp_id: 0x03
         hardware: "Open vSwitch"
-        drop_spoofed_faucet_mac: false
+        drop_spoofed_faucet_mac: False
         interfaces:
             1:
                 name: "sp-t2-sw1"
@@ -78,10 +78,11 @@ dps:
             3:
                 name: "host1"
                 description: "802.1x host"
+                native_vlan: net1
     t2-sw2:
-        dp_id: 0x4
+        dp_id: 0x04
         hardware: "Open vSwitch"
-        drop_spoofed_faucet_mac: false
+        drop_spoofed_faucet_mac: False
         interfaces:
             1:
                 name: "sp-t2-sw2"
@@ -94,3 +95,4 @@ dps:
             3:
                 name: "host2"
                 description: "802.1x host"
+                native_vlan: net2

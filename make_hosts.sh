@@ -15,7 +15,7 @@ sudo ovs-vsctl add-port t2-sw2 veth-host2 \
 		        -- set interface veth-host2 ofport_request=3
 
 # Create Poseidon namespace (for testing)
-create_ns poseidon 192.168.0.2/24
-as_ns poseidon ip route add default via 192.168.0.1
+create_ns poseidon 192.168.20.3/24
+as_ns poseidon ip route add default via 192.168.20.1
 sudo ovs-vsctl add-port t1-sw2 veth-poseidon \
 		        -- set interface veth-poseidon ofport_request=3
