@@ -24,6 +24,7 @@ dps:
         stack:
             priority: 1
         drop_spoofed_faucet_mac: False
+        lacp_timeout: 5
         interfaces:
             1:
                 name: "sp-t2-sw1"
@@ -34,17 +35,22 @@ dps:
                 description: "StackPort to t2-sw2"
                 stack: { dp: t2-sw2, port: 2 }
             4:
-                name: "sp-ext-net-p1"
-                description: "StackPort to External Network"
+                name: "lacp-ext-net-p1"
+                description: "LACP interface to External Network"
+#                native_vlan: 1
+#                lacp: 1
             5:
-                name: "sp-ext-net-p2"
-                description: "StackPort to Extternal Network"
+                name: "lacp-ext-net-p2"
+                description: "LACP interface to Extternal Network"
+#                native_vlan: 1
+#                lacp: 1
     t1-sw2:
         dp_id: 0x02
         hardware: "Open vSwitch"
         stack:
             priority: 1
         drop_spoofed_faucet_mac: False
+        lacp_timeout: 5
         interfaces:
             1:
                 name: "sp-t1-sw2"
@@ -59,11 +65,15 @@ dps:
                 description: "Poseidon"
                 native_vlan: net2
             4:
-                name: "sp-ext-net-p3"
-                description: "StackPort to External Network"
+                name: "lacp-ext-net-p3"
+                description: "LACP interface to External Network"
+#                native_vlan: 1
+#                lacp: 2
             5:
-                name: "sp-ext-net-p4"
-                description: "StackPort to Extternal Network"
+                name: "lacp-ext-net-p4"
+                description: "LACP interface to Extternal Network"
+#                native_vlan: 1
+#                lacp: 2
     t2-sw1:
         dp_id: 0x03
         hardware: "Open vSwitch"
