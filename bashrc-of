@@ -70,7 +70,8 @@ cleanup () {
     sudo ovs-vsctl del-br t1-sw2 2>/dev/null || true
     sudo ovs-vsctl del-br t2-sw1 2>/dev/null || true
     sudo ovs-vsctl del-br t2-sw2 2>/dev/null || true
-    sudo ovs-vsctl del-br ext-net 2>/dev/null || true
+    sudo ovs-vsctl del-br ext-net1 2>/dev/null || true
+    sudo ovs-vsctl del-br ext-net2 2>/dev/null || true
 }
 
 # Add tagged VLAN interface to network namespace
