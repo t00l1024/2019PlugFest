@@ -1,4 +1,10 @@
 acls:
+    mirror-port:
+        - rule:
+            actions:
+                allow: True
+                mirror: 3
+
     office-vlan-protect:
         # Prevent IPv4 communication betwen Office/Guest networks
         - rule:

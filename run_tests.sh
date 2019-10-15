@@ -16,15 +16,9 @@ function ping_test () {
 # Ping local "router IPs"
 ping_test host1 192.168.10.1
 ping_test host2 192.168.20.1
-ping_test poseidon 192.168.20.1
 
-
+# Simple ping tests across datapaths
 ping_test host1 192.168.20.2
-ping_test host1 192.168.20.3
 
 ping_test host2 192.168.10.2
-ping_test host2 192.168.20.3
-
-ping_test poseidon 192.168.10.2
-ping_test poseidon 192.168.20.2
 
