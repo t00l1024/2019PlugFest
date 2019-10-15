@@ -1,0 +1,23 @@
+# freeRADIUS installation and configuration notes
+
+# Install freeradius
+sudo apt install freeradius
+
+# Stop freeradius
+sudo systemctl stop freeradius
+sudo systemctl status freeradius
+
+# Add user bob
+sudo vi /etc/freeradius/3.0/users
+Comment out:
+bob       Cleartext-Password := "hello"
+  Reply-Message := "Hello, %{User-Name}"
+
+
+# Start freeradius in debug mode
+sudo freeradius -X
+
+# Test the connection and authentication
+# readtest <user> <pass> <radius-server> <secret>
+radtest bob hello localhost 0 testing123
+
